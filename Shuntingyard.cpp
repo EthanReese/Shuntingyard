@@ -16,8 +16,15 @@ struct Stack{
     Stack *next;
 };
 
+struct TreeNode{
+        char ch;
+        TreeNode *next1;
+        TreeNode *next2;
+};
+
 void pushOp(char ch, Stack* &top);
 char* popOperator(Stack* &top);
+char* reverse(char* string);
 
 int main(){
     Stack* top = NULL;
@@ -38,10 +45,9 @@ int main(){
         //If the input is a number
         if(isdigit(*(input))){
             //Add the digit to the end of the output quene
-            char append[3];
+            char append[2];
             append[0] = *(input);
-            append[1] = ' ';
-            append[2] = '\0';
+            append[1] = '\0';
             strcat(outputQuene, append);
             //strcat(outputQuene, ' ');
         }
@@ -65,6 +71,11 @@ int main(){
         }
             //Anything else will have to be an operator
         else{
+          //Add a space to the output quene to clarify double digit numbers
+          char add[2];
+          add[0] = ' ';
+          add[1] = '\0';
+          strcat(outputQuene, add);
             //Assuming there's actually something on the stack and the input is an operator
             if(precedence.find(*(input)) != precedence.end()){
                 if(top != NULL) {
@@ -97,6 +108,10 @@ int main(){
            strcat(outputQuene, append);
     }
     cout << outputQuene << endl;
+     //Take the postfix notation and turn it into a binary expression tree
+     char* postfix = reverse(outputQuene);
+
+
     delete[] outputQuene;
     return 0;
 }
@@ -118,3 +133,26 @@ char* popOperator(Stack* &top){
     return op;
 }
 
+char* reverse(char* string){
+     //Create an array to save the reverse order
+     char* array = new char[80];
+     char firstChar = *(string);
+     //Go until the string ends to find the last character
+     while(*(string) != NULL){
+          if(*(string) =='\0'){
+               //Once it reaches the end of the string then it needs to reverse through to the beginning
+               while(*(string) != firstChar){
+                    strcat(array, *(string));
+                    string--;
+               }
+               //Append the first character back onto the string.
+               char append[2];
+               append[0] = firstChar;
+               append[1] = '\0';
+               strcat(array, append);
+               break;
+          }
+          string++;
+     }
+     return array;
+}
