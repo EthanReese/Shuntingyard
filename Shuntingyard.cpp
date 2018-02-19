@@ -28,6 +28,7 @@ char* reverse(char* string);
 
 int main(){
     Stack* top = NULL;
+    TreeNode* root = NULL;
     //Define the precedence for the various operators.
     map<char, int> precedence;
     precedence['+'] = 2;
@@ -110,7 +111,38 @@ int main(){
     cout << outputQuene << endl;
      //Take the postfix notation and turn it into a binary expression tree
      char* postfix = reverse(outputQuene);
-
+     TreeNode* current = NULL;
+     cout << postfix << endl;
+     while(*(postfix) != NULL){
+          //For the very first character in the expression, it must become the root
+          if(root == NULL){
+               root = new struct TreeNode();
+               root->ch = *(postfix);
+               root -> next1 = NULL;
+               root -> next2 = NULL;
+               current = root;     
+          }
+          //Otherwise if must move through the rest of the logic normally
+          else{
+               //Create a new node for the element in the list
+               TreeNode* newnode = new struct TreeNode();
+               newnode -> ch = *(postfix);
+               newnode -> next1 = NULL;
+               newnode -> next2 = NULL;
+               //Check if the current node can have more children and which slot is available
+               if(current -> next1 != NULL){
+                    current -> next1 = newnode;
+                    current = newnode;
+               }
+               else if(current->next2 != NULL){
+                    current -> next2 = newnode;
+                    current = newnode;
+               }
+               else{
+                    //It has to search up the list for the first parent that can have a child
+               }
+          }
+     }
 
     delete[] outputQuene;
     return 0;
@@ -138,11 +170,14 @@ char* reverse(char* string){
      char* array = new char[80];
      char firstChar = *(string);
      //Go until the string ends to find the last character
-     while(*(string) != NULL){
+     while(true){
           if(*(string) =='\0'){
                //Once it reaches the end of the string then it needs to reverse through to the beginning
                while(*(string) != firstChar){
-                    strcat(array, *(string));
+                    char append[2];
+                    append[0] = *(string);
+                    append[1] = '\0';
+                    strcat(array, append);
                     string--;
                }
                //Append the first character back onto the string.
