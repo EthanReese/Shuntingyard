@@ -21,7 +21,6 @@ struct TreeNode{
         TreeNode *right;
         TreeNode *left;
         TreeNode *parent;
-        bool visited;
 };
 
 struct TreeStack{
@@ -39,7 +38,6 @@ void pushOp(char ch, Stack* &top);
 void pushTree(TreeNode* tn, TreeStack* &top);
 char* popOperator(Stack* &top);
 TreeNode* popTree(TreeStack* &top);
-void printPrefix(TreeNode* &root, int);
 void LinkedList(node* &head, char* string);
 void printPrefixBetter(TreeNode* &current);
 
@@ -152,94 +150,6 @@ int main(){
           }
           now = now->next;
      }
-     /*while(now != NULL){
-          //I arbitrarily decided that 80 digits was the highest worth supporting but this could go higher
-          char* operate = new char[80];
-          //Deal with the whole two digit numbers thing
-          int counter = 0;
-          if(isdigit(*(postfix))){
-               while(*(postfix) != NULL){
-                    operate[counter] = *(postfix);
-                    postfix++;
-                    counter++;
-                    //If it gets to a space then it means its the end of a number
-                    if(*(postfix) == ' '){
-                         operate[counter] = '\0';
-                         counter = 0;
-                         break;
-                    }
-                    //It also means its the end of the number if the next character is an operator
-                    else if(precedence.find(*(postfix)) != precedence.end()){
-                         operate[counter] = '\0';
-                         counter = 0;
-                         --postfix;
-                         break;
-                     } 
-               }
-               
-          }
-          //If its an operator than put it into the array to append
-          else if(precedence.find(*(postfix)) != precedence.end()){
-               operate[0] = *(postfix);
-               operate[1] = '\0';
-          } 
-          //For the very first character in the expression, it must become the root
-          if(nodeCount == 0){
-               root = new struct TreeNode();
-               root->ch = new char[80];
-               strcpy(root->ch, now->ch);
-               root -> next1 = NULL;
-               root -> next2 = NULL;
-               root -> parent = NULL;
-               root -> visited = false;
-               current = root;
-               nodeCount++;
-          }
-          //Otherwise it must move through the rest of the logic normally
-          else{
-               //Create a new node for the element in the list
-               TreeNode* newnode = new struct TreeNode();
-               ++nodeCount;
-               newnode->ch = new char[80];
-               strcpy(newnode -> ch, now->ch);
-               newnode -> next1 = NULL;
-               newnode -> next2 = NULL;
-               newnode -> parent = NULL;
-               newnode -> visited = false;
-               //Check if the current node can have more children and which slot is available 
-               if(current -> next2 == NULL){
-                    current -> next2 = newnode;
-                    newnode -> parent = current;
-                    current = newnode;
-               }
-               else if(current->next1 == NULL){
-                    current -> next1 = newnode;
-                    newnode -> parent = current;
-                    current = newnode;
-               }
-               else{
-                    //It has to search up the list for the first parent that can have a child
-                    while(current->parent != NULL){
-                         //Check if the new current node can have children and which slot is open     
-                         if(current -> next2 == NULL){
-                              current -> next2 = newnode;
-                              newnode -> parent = current;
-                              current = newnode;
-                         }
-                         else if(current->next1 == NULL){
-                              current -> next1 = newnode;
-                              newnode -> parent = current;
-                              current = newnode;
-                           }
-                         //Set the current to its parent if the node has no potential children
-                          else{
-                              current = current->parent;
-                            }
-                    }
-               }
-          }
-          now = now->previous;
-     }*/
      //Check what kind of notation the user would like to print out
      cout << "Enter what kind of notation you would like for output: Prefix(1) Postfix(2) Infix(3)" << endl;
      char* input_2 = new char[2];
@@ -293,54 +203,6 @@ TreeNode* popTree(TreeStack* &top){
     delete node;
     return content;
 }
-
-/*void printPrefix(TreeNode* &root, int nodecount){
-     TreeNode* current = root;
-     //While there are still nodes that have not been read
-     while(nodecount != 0){
-          //If the node has already been visited it has to go through the children
-          if(current->visited == true){
-               //Check if the first child has been visited 
-               if(current->next1 != NULL){
-                    if(current->next1->visited != true){
-                         current = current->next1;
-                    }
-               }
-               //Check if the second child has been visited
-               else if(current->next2 != NULL){
-                   if(current->next2->visited != true){ 
-                         current = current->next2;
-                   }
-               }
-               //If both children have been visited then it has to go up in the tree
-               else if(current->parent != NULL){
-                    current = current->parent;
-               }
-          }
-          //Otherwise the node hasn't been visited then it has to add the characters to the output quene
-          else{
-          //     cout << current->ch << ' ';
-               current->visited = true;
-               nodecount--;
-               //Check if the first child has been visited
-               if(current->next1 != NULL){
-                    if(current->next1->visited != true){
-                         current = current->next1;
-                    }
-               }
-               //Check if the second child has been visited
-               else if(current->next2 != NULL){
-                   if(current->next2->visited != true){ 
-                         current = current->next2;
-                   }
-               }
-               //If both children have been visited then it has to go up in the tree
-               else if(current->parent != NULL){
-                    current = current->parent;
-               }
-          }
-     }
-}*/
 //Convert an out
 void LinkedList(node* &head, char* string){
      //Loop over the whole string
