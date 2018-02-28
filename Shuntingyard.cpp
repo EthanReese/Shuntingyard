@@ -18,16 +18,30 @@ struct Stack{
 
 struct TreeNode{
         char* ch;
-        TreeNode *next1;
-        TreeNode *next2;
+        TreeNode *right;
+        TreeNode *left;
         TreeNode *parent;
-        bool visited = false;
+        bool visited;
+};
+
+struct TreeStack{
+     TreeNode* tn;
+     TreeStack* next;
+};
+
+struct node{
+        char* ch;
+        node *next;
+        node *previous;
 };
 
 void pushOp(char ch, Stack* &top);
+void pushTree(TreeNode* tn, TreeStack* &top);
 char* popOperator(Stack* &top);
-char* reverse(char* string);
+TreeNode* popTree(TreeStack* &top);
 void printPrefix(TreeNode* &root, int);
+void LinkedList(node* &head, char* string);
+void printPrefixBetter(TreeNode* &current);
 
 int main(){
     Stack* top = NULL;
@@ -43,6 +57,8 @@ int main(){
     cout << "Please enter your expression: ";
     char* input = new char[80];
     cin >> input;
+    char* infix = new char[80];
+    infix = input;
     char* outputQuene = new char[80];
     //Keep going while there are still characters in the input buffer
     while(*(input) != NULL){
@@ -84,8 +100,8 @@ int main(){
             if(precedence.find(*(input)) != precedence.end()){
                 if(top != NULL) {
                     //If the precedence on the stack is greater or the precednece is equal and its a left operator
-                    while ((precedence[*(input)] < precedence[top->ch]) ||
-                           ((precedence[*(input)] == precedence[top->ch]) && (*(input) != '^'))) {
+                    while ((precedence[*(input)] < precedence[top->ch]) || 
+                              ((precedence[*(input)] == precedence[top->ch]) && (*(input) != '^'))) {
                         //Make sure the top of the stack isn't a left bracket, ik it should go in the while but it was getting unmanageable
                         if (top->ch == '(') {
                             break;
@@ -111,14 +127,34 @@ int main(){
            append[1] = '\0';
            strcat(outputQuene, append);
     }
-    cout << outputQuene << endl;
+    cout << "Postfix: " << outputQuene << endl;
      //Take the postfix notation and turn it into a binary expression tree
-     char* postfix = reverse(outputQuene);
-     TreeNode* current = NULL;
-     int nodeCount = 0;
-     while(*(postfix) != NULL){
+     node* head = NULL;
+     LinkedList(head, outputQuene);
+     node* now = head;
+     TreeStack* lead = NULL;
+     //Loop through each node and turn it into a binary expansion tree
+     while(now != NULL){
+          //If its a digit push it onto the stack
+          if(isdigit((now->ch)[0])){
+               TreeNode* newNode = new struct TreeNode();
+               newNode->ch = new char[80];
+               strcpy(newNode->ch, now->ch);
+               pushTree(newNode, lead);
+          }
+          else{
+               TreeNode* newNode = new struct TreeNode();
+               newNode->ch = new char[80];
+               strcpy(newNode->ch, now->ch);
+               newNode->left = popTree(lead);
+               newNode->right = popTree(lead);
+               pushTree(newNode, lead);
+          }
+          now = now->next;
+     }
+     /*while(now != NULL){
           //I arbitrarily decided that 80 digits was the highest worth supporting but this could go higher
-          char operate[80];
+          char* operate = new char[80];
           //Deal with the whole two digit numbers thing
           int counter = 0;
           if(isdigit(*(postfix))){
@@ -150,31 +186,34 @@ int main(){
           //For the very first character in the expression, it must become the root
           if(nodeCount == 0){
                root = new struct TreeNode();
-               root->ch = operate;
+               root->ch = new char[80];
+               strcpy(root->ch, now->ch);
                root -> next1 = NULL;
                root -> next2 = NULL;
                root -> parent = NULL;
+               root -> visited = false;
                current = root;
                nodeCount++;
-               cout << nodeCount;     
           }
           //Otherwise it must move through the rest of the logic normally
           else{
                //Create a new node for the element in the list
                TreeNode* newnode = new struct TreeNode();
                ++nodeCount;
-               newnode -> ch = &(*(postfix));
+               newnode->ch = new char[80];
+               strcpy(newnode -> ch, now->ch);
                newnode -> next1 = NULL;
                newnode -> next2 = NULL;
                newnode -> parent = NULL;
+               newnode -> visited = false;
                //Check if the current node can have more children and which slot is available 
-               if(current -> next1 != NULL){
-                    current -> next1 = newnode;
+               if(current -> next2 == NULL){
+                    current -> next2 = newnode;
                     newnode -> parent = current;
                     current = newnode;
                }
-               else if(current->next2 != NULL){
-                    current -> next2 = newnode;
+               else if(current->next1 == NULL){
+                    current -> next1 = newnode;
                     newnode -> parent = current;
                     current = newnode;
                }
@@ -182,13 +221,13 @@ int main(){
                     //It has to search up the list for the first parent that can have a child
                     while(current->parent != NULL){
                          //Check if the new current node can have children and which slot is open     
-                         if(current -> next1 != NULL){
-                              current -> next1 = newnode;
+                         if(current -> next2 == NULL){
+                              current -> next2 = newnode;
                               newnode -> parent = current;
                               current = newnode;
                          }
-                         else if(current->next2 != NULL){
-                              current -> next2 = newnode;
+                         else if(current->next1 == NULL){
+                              current -> next1 = newnode;
                               newnode -> parent = current;
                               current = newnode;
                            }
@@ -199,12 +238,24 @@ int main(){
                     }
                }
           }
-          postfix++;
-     }
-     cout << root->ch<< endl;
+          now = now->previous;
+     }*/
      //Check what kind of notation the user would like to print out
      cout << "Enter what kind of notation you would like for output: Prefix(1) Postfix(2) Infix(3)" << endl;
-     printPrefix(root, nodeCount);
+     char* input_2 = new char[2];
+     cin >> input_2;
+     if(strcmp(input_2, "1") == 0){
+          printPrefixBetter(lead->tn);
+     }
+     else if(strcmp(input_2, "2") == 0){
+          cout << outputQuene;
+     }
+     else if(strcmp(input_2, "3") == 0){
+          cout << infix <<  endl;
+     }
+     else{
+             cout << "There was an error" << endl;
+     }
     delete[] outputQuene;
     return 0;
 }
@@ -217,6 +268,15 @@ void pushOp(char ch, Stack* &top){
     top = newnode;
 }
 
+//Function to add an operator to the stack
+void pushTree(TreeNode* tn, TreeStack* &top){
+    TreeStack* newnode = new struct TreeStack();
+    newnode -> tn = tn;
+    newnode -> next = top;
+    top = newnode;
+}
+
+
 //Pop an operator off of the top of the stack
 char* popOperator(Stack* &top){
     Stack* node = top;
@@ -225,36 +285,16 @@ char* popOperator(Stack* &top){
     delete node;
     return op;
 }
-
-char* reverse(char* string){
-     //Create an array to save the reverse order
-     char* array = new char[80];
-     char firstChar = *(string);
-     //Go until the string ends to find the last character
-     while(true){
-          if(*(string) =='\0'){
-               //Once it reaches the end of the string then it needs to reverse through to the beginning
-               while(*(string) != firstChar){
-                    char append[2];
-                    append[0] = *(string);
-                    append[1] = '\0';
-                    strcat(array, append);
-                    string--;
-               }
-               //Append the first character back onto the string.
-               char append[2];
-               append[0] = firstChar;
-               append[1] = '\0';
-               strcat(array, append);
-               break;
-          }
-          string++;
-     }
-     return array;
+//Pop an operator off of the top of the stack
+TreeNode* popTree(TreeStack* &top){
+    TreeStack* node = top;
+    TreeNode* content = top->tn;
+    top = top->next;
+    delete node;
+    return content;
 }
 
-void printPrefix(TreeNode* &root, int nodecount){
-     char* output = new char[80];
+/*void printPrefix(TreeNode* &root, int nodecount){
      TreeNode* current = root;
      //While there are still nodes that have not been read
      while(nodecount != 0){
@@ -279,7 +319,7 @@ void printPrefix(TreeNode* &root, int nodecount){
           }
           //Otherwise the node hasn't been visited then it has to add the characters to the output quene
           else{
-               strcat(output, current->ch);
+          //     cout << current->ch << ' ';
                current->visited = true;
                nodecount--;
                //Check if the first child has been visited
@@ -300,6 +340,79 @@ void printPrefix(TreeNode* &root, int nodecount){
                }
           }
      }
-     cout << output << endl;
-     delete[] output;
+}*/
+//Convert an out
+void LinkedList(node* &head, char* string){
+     //Loop over the whole string
+     node* current = NULL;
+     while(*(string) != NULL){
+          //Create the first node in the list
+          if(*(string) == ' '){
+               string++;
+          }
+          else if(head == NULL && *(string)!=' '){
+               char* append = new char[80];
+               head = new struct node;
+               head->next = NULL;
+               head->previous = NULL;
+               int counter = 0;
+               //If its a number it honeslty becomes kind of a pain
+               if(isdigit(*(string))){
+                       while(isdigit(*(string))){
+                            append[counter] = *(string);
+                            counter++;
+                            string++;
+                       }
+                       append[counter] = '\0';
+               }
+               else{
+                    append[0] = *(string);
+                    append[1] = '\0';
+                    string++;
+               }
+               head->ch = new char[80];
+               strcpy(head->ch, append);
+               delete[] append;
+               current = head;
+          }
+          else{
+               int counter = 0;
+               node* newnode = new struct node();
+               newnode->previous = current;
+               current->next = newnode;
+               char* append = new char[80];
+               //If its a number it honeslty becomes kind of a pain
+               if(isdigit(*(string))){
+                       while(isdigit(*(string))){
+                            append[counter] = *(string);
+                            counter++;
+                            string++;
+                       }
+                       append[counter] = '\0';
+               }
+               else{
+                    append[0] = *(string);
+                    append[1] = '\0';
+                    string++;
+               }
+               newnode->ch = new char[80];
+               strcpy(newnode->ch, append);
+               delete[] append;
+               newnode->next = NULL;
+               current = newnode;
+               //cout << newnode->ch;
+               //cout << *(string);
+          }
+     }
+}
+void printPrefixBetter(TreeNode* &current){
+      if(current->ch != NULL){       
+          cout << current->ch << ' ';
+             if(current->right != NULL){
+                  printPrefixBetter(current->right);
+             }
+             if(current->left != NULL){
+                  printPrefixBetter(current->left);
+             }
+     }
 }
