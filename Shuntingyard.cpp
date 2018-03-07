@@ -40,6 +40,7 @@ char* popOperator(Stack* &top);
 TreeNode* popTree(TreeStack* &top);
 void LinkedList(node* &head, char* string);
 void printPrefixBetter(TreeNode* &current);
+void printPostfix(TreeNode* &current);
 
 int main(){
     Stack* top = NULL;
@@ -128,8 +129,8 @@ int main(){
            append[1] = '\0';
            strcat(outputQuene, append);
     }
-    cout << "Postfix: " << outputQuene << endl;
-     //Take the postfix notation and turn it into a binary expression tree
+   cout << outputQuene << endl; 
+    //Take the postfix notation and turn it into a binary expression tree
      node* head = NULL;
      LinkedList(head, outputQuene);
      node* now = head;
@@ -161,7 +162,7 @@ int main(){
           printPrefixBetter(lead->tn);
      }
      else if(strcmp(input_2, "2") == 0){
-          cout << outputQuene;
+          printPostfix(lead->tn);
      }
      else if(strcmp(input_2, "3") == 0){
           cout << infix <<  endl;
@@ -279,5 +280,16 @@ void printPrefixBetter(TreeNode* &current){
              if(current->left != NULL){
                   printPrefixBetter(current->left);
              }
+     }
+}
+void printPostfix(TreeNode* &current){
+     if(current->ch != NULL){
+        if(current->right != NULL){
+                  printPostfix(current->right);
+             }
+          if(current->left != NULL){
+                  printPostfix(current->left);
+             } 
+          cout << current->ch << ' '; 
      }
 }
