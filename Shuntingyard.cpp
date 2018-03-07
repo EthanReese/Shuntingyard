@@ -54,12 +54,12 @@ int main(){
     //Prompt the user to enter their expression
     cout << "Please enter your expression: ";
     char* input = new char[80];
-    cin >> input;
+    cin.getline(input, 80);
     char* infix = new char[80];
     infix = input;
     char* outputQuene = new char[80];
     //Keep going while there are still characters in the input buffer
-    while(*(input) != NULL){
+    while(*(input) != '\0'){
         //If the input is a number
         if(isdigit(*(input))){
             //Add the digit to the end of the output quene
@@ -72,6 +72,9 @@ int main(){
             //If its a left bracket just drop it onto the stack
         else if('(' == *(input)){
             pushOp(*(input), top);
+        }
+        else if(' ' == *(input)){
+               //Ignore the space because it gets incorporated later
         }
         else if(*(input) == ')'){
             //Pop operators off of the stack until it finds the corresponding left parenthesis
@@ -87,7 +90,7 @@ int main(){
                 return 5;
             }
         }
-            //Anything else will have to be an operator
+     //Anything else will have to be a normal operator
         else{
           //Add a space to the output quene to clarify double digit numbers
           char add[2];
